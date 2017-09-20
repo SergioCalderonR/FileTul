@@ -10,9 +10,19 @@ Windows 10 Fall Creators Update
 
 #pragma comment(lib, "Pathcch.lib")
 
+//Show error message using Windows error codes
 VOID ShowError(DWORD errId)
 {
+	DWORD formatOptions = FORMAT_MESSAGE_ALLOCATE_BUFFER
+						| FORMAT_MESSAGE_FROM_SYSTEM
+						| FORMAT_MESSAGE_IGNORE_INSERTS;
+	DWORD langId=LANG_SYSTEM_DEFAULT;
+	LPWSTR errMsg;
 
+	if (!FormatMessageW(formatOptions, NULL, errId, langId, (LPWSTR)&errMsg, 0, NULL))
+		wprintf(L"Could not get the error message. Code: %lu\n", GetLastError());
+
+	wprintf(L"%s\n", errMsg);
 
 }
 
@@ -24,7 +34,7 @@ int wmain(int argc, WCHAR *argv[])
 	PWSTR path=NULL;
 
 	//CreateFileW
-	LPCWSTR fileName = L"TestFile.txt";
+	LPCWSTR fileName=NULL;
 	DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE;
 	DWORD sharedMode = FILE_SHARE_WRITE;
 	DWORD creationDisposition = CREATE_NEW;
@@ -32,32 +42,60 @@ int wmain(int argc, WCHAR *argv[])
 
 	//Results
 	HANDLE newFile;
-	HRESULT hResult = SHGetKnownFolderPath(folderId, flags, NULL,&path);
+	HRESULT hResult;
 
 	//PathCchCombine
 	WCHAR pathCombined[MAX_PATH];
 	SIZE_T sizeOfPath = MAX_PATH;
 
+	if (argc == 1)
+	{
+		wprintf(L"\nUsage: FileTul [FolderType]");
+		exit(1);
+
+	}
+		
+
+	//Getting the current directory to Documents folder
+	hResult = SHGetKnownFolderPath(folderId, flags, NULL, &path);
+
 	if (hResult != S_OK)
 		wprintf(L"Error code: %lu\n", GetLastError());
-	else
+	else //Got the Documents path
 	{
-		wprintf(L"Documents path: %s\n", path);
-		wprintf(L"%s\n", fileName);
+		wprintf(L"Documents path: %s\n", path);		
+		
 
-		HRESULT fullPath = PathCchCombine(pathCombined, sizeOfPath, path, fileName);
-
-		if (fullPath != S_OK)
-			wprintf(L"Error combining full path. Code: %lu\n", GetLastError());
+		if (PathCchCombine(pathCombined, sizeOfPath, path, L"TestFile.txt") != S_OK)
+			ShowError(GetLastError());
 		else
-			wprintf(L"Full path: %s\n", pathCombined);
+		{
+			
+			fileName = pathCombined;
+			/*wprintf(L"Full path: %s\n", fileName);*/
+
+			newFile = CreateFileW(fileName, desiredAccess, sharedMode, NULL,
+								creationDisposition, flagsAndAttributes, NULL);
+
+			if (newFile != INVALID_HANDLE_VALUE)
+			{
+				wprintf(L"File was created on: %s\n", fileName);
+			}
+			else
+			{
+				wprintf(L"File could not be created. Error code: ");
+				ShowError(GetLastError());
+			}
+
+			
+
+		}
+			
 
 		CoTaskMemFree(path);
 	}
 
-	
 
-	getchar();
 
 	return 0;
 }
