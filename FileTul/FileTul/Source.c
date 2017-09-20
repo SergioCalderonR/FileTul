@@ -6,6 +6,15 @@ Windows 10 Fall Creators Update
 #include <Windows.h>
 #include <tchar.h>
 #include <ShlObj.h>
+#include <PathCch.h>
+
+#pragma comment(lib, "Pathcch.lib")
+
+VOID ShowError(DWORD errId)
+{
+
+
+}
 
 int wmain(int argc, WCHAR *argv[])
 {
@@ -25,10 +34,28 @@ int wmain(int argc, WCHAR *argv[])
 	HANDLE newFile;
 	HRESULT hResult = SHGetKnownFolderPath(folderId, flags, NULL,&path);
 
-	if (hResult == S_OK)
-		wprintf(L"%s\n", path);
-	else
+	//PathCchCombine
+	WCHAR pathCombined[MAX_PATH];
+	SIZE_T sizeOfPath = MAX_PATH;
+
+	if (hResult != S_OK)
 		wprintf(L"Error code: %lu\n", GetLastError());
+	else
+	{
+		wprintf(L"Documents path: %s\n", path);
+		wprintf(L"%s\n", fileName);
+
+		HRESULT fullPath = PathCchCombine(pathCombined, sizeOfPath, path, fileName);
+
+		if (fullPath != S_OK)
+			wprintf(L"Error combining full path. Code: %lu\n", GetLastError());
+		else
+			wprintf(L"Full path: %s\n", pathCombined);
+
+		CoTaskMemFree(path);
+	}
+
+	
 
 	getchar();
 
