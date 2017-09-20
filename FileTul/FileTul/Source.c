@@ -131,6 +131,50 @@ int wmain(int argc, WCHAR *argv[])
 
 			
 		}
+		else if (_wcsicmp(argv[1], L"-Desktop") == 0)
+		{
+			//Getting the current directory to Desktop folder
+
+			hResult = SHGetKnownFolderPath(&FOLDERID_Desktop, flags, NULL, &path);
+			
+
+			if (hResult != S_OK) //If fails
+			{
+				wprintf(L"Error getting Desktop folder path. Code: ");
+				ShowError(GetLastError());
+			}
+			else //Got the Desktop path
+			{
+				wprintf(L"\nDesktop path: %s\n", path);
+
+				FileCreate(path);
+				CoTaskMemFree(path);
+
+
+			}
+		}
+		else if (_wcsicmp(argv[1], L"-Music") == 0)
+		{
+			//Getting the current directory to Music folder
+
+			hResult = SHGetKnownFolderPath(&FOLDERID_Music, flags, NULL, &path);
+
+
+			if (hResult != S_OK) //If fails
+			{
+				wprintf(L"Error getting Music folder path. Code: ");
+				ShowError(GetLastError());
+			}
+			else //Got the Music path
+			{
+				wprintf(L"\nMusic path: %s\n", path);
+
+				FileCreate(path);
+				CoTaskMemFree(path);
+
+
+			}
+		}
 		else
 			wprintf(L"Miss typing.\n");
 
