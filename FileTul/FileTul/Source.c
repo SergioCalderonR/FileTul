@@ -32,9 +32,9 @@ VOID FileCreate(PWSTR path)
 
 	//CreateFileW
 	LPCWSTR fileName = NULL;
-	DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE;
+	DWORD desiredAccess = GENERIC_WRITE;
 	DWORD sharedMode = FILE_SHARE_WRITE;
-	DWORD creationDisposition = CREATE_NEW;
+	DWORD creationDisposition = CREATE_ALWAYS;
 	DWORD flagsAndAttributes = FILE_ATTRIBUTE_NORMAL;
 
 	//PathCchCombine
@@ -54,6 +54,7 @@ VOID FileCreate(PWSTR path)
 		if (newFile != INVALID_HANDLE_VALUE)
 		{
 			wprintf(L"\nFile was created on: %s\n", pathCombined);
+			ShowError(GetLastError());
 		}
 		else
 		{
@@ -175,8 +176,57 @@ int wmain(int argc, WCHAR *argv[])
 
 			}
 		}
+		else if (_wcsicmp(argv[1], L"-AppData") == 0)
+		{
+			//Getting the current directory to Local AppData folder
+
+			hResult = SHGetKnownFolderPath(&FOLDERID_LocalAppData, flags, NULL, &path);
+
+
+			if (hResult != S_OK) //If fails
+			{
+				wprintf(L"Error getting AppData folder path. Code: ");
+				ShowError(GetLastError());
+			}
+			else //Got the AppData path
+			{
+				wprintf(L"\nLocal AppData path: %s\n", path);
+
+				FileCreate(path);
+				CoTaskMemFree(path);
+
+
+			}
+
+		}
+		else if (_wcsicmp(argv[1], L"-WinDir") == 0)
+		{
+			//Getting the current directory to Windows directory folder
+
+			hResult = SHGetKnownFolderPath(&FOLDERID_Windows, flags, NULL, &path);
+
+
+			if (hResult != S_OK) //If fails
+			{
+				wprintf(L"Error getting WinDir folder path. Code: ");
+				ShowError(GetLastError());
+			}
+			else //Got the WinDir path
+			{
+				wprintf(L"\nWindows directory path: %s\n", path);
+
+				FileCreate(path);
+				CoTaskMemFree(path);
+
+
+			}
+
+		}
 		else
-			wprintf(L"Miss typing.\n");
+		{
+			FileCreate(argv[1]);
+		}
+			
 
 		break;
 
