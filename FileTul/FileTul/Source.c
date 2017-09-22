@@ -25,6 +25,7 @@ VOID ShowHelp()
 		L"-Pictures\n\n"
 		L"-Music\n\n"
 		L"-Desktop\n\n"
+		L"-AppData\n\n"
 		L"Example: FileTu.exe -Documents\n\n");
 
 	wprintf(
