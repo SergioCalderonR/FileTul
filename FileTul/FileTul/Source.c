@@ -26,7 +26,7 @@ VOID ShowHelp()
 		L"-Music\n\n"
 		L"-Desktop\n\n"
 		L"-AppData\n\n"
-		L"Example: FileTu.exe -Documents\n\n");
+		L"Example: FileTul.exe -Documents\n\n");
 
 	wprintf(
 		L"--To encrypt a file using EFS: FileTul.exe -ef [PathToFile]\n\n"
@@ -49,6 +49,8 @@ VOID ShowError(DWORD errId)
 		wprintf(L"Could not get the error message. Code: %lu\n", GetLastError());
 
 	wprintf(L"\n%s\n", errMsg);
+
+	LocalFree(errMsg);
 
 }
 
@@ -263,15 +265,18 @@ int wmain(int argc, WCHAR *argv[])
 
 				if (EncryptFileW(argv[2]))
 				{
-					wprintf(L"\nFile encyrpted.\n");
+					wprintf(L"\nFile encyrpted using EFS.\n");
 					ShowError(GetLastError());
 				}
 				else
 					ShowError(GetLastError());
 
 			}
-			else
-				ShowHelp();
+			else if(_wcsicmp(argv[1], L"-w")==0)
+			{
+
+
+			}
 
 			break;
 
