@@ -11,6 +11,30 @@ Windows 10 Fall Creators Update
 
 #pragma comment(lib, "Pathcch.lib")
 
+VOID ShowHelp()
+{
+	//Printing help
+	wprintf(L"\nFileTul 1.0 - Write and set attributes to sample files in different Windows locations\n" 
+			L"Copyrigth (C) 2017 Sergio Calderon\n"
+			L"Checho's Blog - http://geeks.ms/blogs/checho \n");
+
+	wprintf(L"\nUsage: \n\n"
+		L"--To create a sample file: FileTul.exe [Option]\n\n"
+		L"[Options]: \n\n"
+		L"-Documents\n\n"
+		L"-Pictures\n\n"
+		L"-Music\n\n"
+		L"-Desktop\n\n"
+		L"Example: FileTu.exe -Documents\n\n");
+
+	wprintf(
+		L"--To encrypt a file using EFS: FileTul.exe -ef [PathToFile]\n\n"
+		L"Example: FileTul.exe -EF C:\\Users\\Andy\\Documents\\newfile.txt\n");
+
+
+
+}
+
 //Show error message using Windows error codes
 VOID ShowError(DWORD errId)
 {
@@ -23,7 +47,7 @@ VOID ShowError(DWORD errId)
 	if (!FormatMessageW(formatOptions, NULL, errId, langId, (LPWSTR)&errMsg, 0, NULL))
 		wprintf(L"Could not get the error message. Code: %lu\n", GetLastError());
 
-	wprintf(L"%s\n", errMsg);
+	wprintf(L"\n%s\n", errMsg);
 
 }
 
@@ -53,13 +77,14 @@ VOID FileCreate(PWSTR path)
 
 		if (newFile != INVALID_HANDLE_VALUE)
 		{
-			wprintf(L"\nFile was created on: %s\n", pathCombined);
 			ShowError(GetLastError());
+			CloseHandle(newFile);
 		}
 		else
 		{
 			wprintf(L"\nFile could not be created. Error code: ");
 			ShowError(GetLastError());
+
 		}
 	}
 
@@ -80,7 +105,7 @@ int wmain(int argc, WCHAR *argv[])
 
 	if (argc == 1)
 	{
-		wprintf(L"\nUsage: %s [FolderType]\n", argv[0]);
+		ShowHelp();
 		exit(1);
 
 	}
@@ -224,13 +249,33 @@ int wmain(int argc, WCHAR *argv[])
 		}
 		else
 		{
-			FileCreate(argv[1]);
+			ShowHelp();
 		}
 			
 
 		break;
 
+		case 3:
+			if (_wcsicmp(argv[1], L"-EF") == 0)
+			{
+
+
+				if (EncryptFileW(argv[2]))
+				{
+					wprintf(L"\nFile encyrpted.\n");
+					ShowError(GetLastError());
+				}
+				else
+					ShowError(GetLastError());
+
+			}
+			else
+				ShowHelp();
+
+			break;
+
 	default:
+		ShowHelp();
 		break;
 	}
 
