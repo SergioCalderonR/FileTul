@@ -98,6 +98,17 @@ VOID FileCreate(PWSTR path)
 
 int wmain(int argc, WCHAR *argv[])
 {
+	//WriteFile and CreateFile
+	DWORD desiredAccess = GENERIC_WRITE;
+	DWORD shareMode = FILE_SHARE_WRITE;
+	DWORD creationDispo = OPEN_EXISTING;
+	DWORD flagsAndAttributes = FILE_ATTRIBUTE_NORMAL;
+
+	WCHAR dataToFile[] = { L"This is a test file." };
+	LPCVOID pBuffer = (LPCVOID)dataToFile;
+
+
+
 	//SHGetKnownFolderPath
 	REFKNOWNFOLDERID folderId = &FOLDERID_Documents;
 	DWORD flags = KF_FLAG_DEFAULT;
@@ -274,6 +285,32 @@ int wmain(int argc, WCHAR *argv[])
 			}
 			else if(_wcsicmp(argv[1], L"-w")==0)
 			{
+				DWORD bytesWritten;
+				HANDLE openFile = CreateFile(argv[2], desiredAccess, shareMode, NULL, creationDispo, flagsAndAttributes, NULL);
+				if (openFile != INVALID_HANDLE_VALUE)
+				{
+					if (!WriteFile(openFile, pBuffer, sizeof(dataToFile), &bytesWritten, NULL))
+					{
+						wprintf(L"\nError writing file: ");
+						ShowError(GetLastError());
+
+					}
+					else
+					{
+						ShowError(GetLastError());
+
+					}
+
+					
+
+
+				}
+				else
+				{
+					wprintf(L"\nError opening file: ");
+					ShowError(GetLastError());
+				}
+
 
 
 			}
